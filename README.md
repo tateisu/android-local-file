@@ -62,7 +62,8 @@ SAFやらFileProviderやらを使ってみたモックアップです
 +	5.0以降でもFile APIを使ってサブフォルダの作成が可能
 +	setLastModifiedは不可能
 +	プライマリストレージではない場合、ファイルパスへの変換は非公開APIを使えば可能
-
+ + 「StorageManager StorageVolume  getPath」で検索
+ 
 ## ローカルファイルを他アプリにシェアする手順
 
 ### File URIでのシェア
