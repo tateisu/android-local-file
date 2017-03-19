@@ -504,6 +504,9 @@ public class ActMain extends AppCompatActivity
 				break;
 			}
 			uri = FileProvider.getUriForFile(this, "jp.juggler.testsaf.fileprovider", file);
+			// LGV32(Android 6.0)でSDカードを使うと例外発生
+			// IllegalArgumentException: Failed to find configured root that contains /storage/3136-6334/image1.jpg
+			// ワークアラウンド： FileProviderに指定するpath xml に <root-path  name="pathRoot" path="." /> を追加
 			if( uri == null ){
 				Utils.showToast( this, true, "can not get FileProvider URI from %s", file.getAbsolutePath() );
 				break;

@@ -5,5 +5,5 @@
     <external-path name="pathExternal" path="." />
     <external-files-path name="pathExternalFile" path="." />
     <external-cache-path name="pathExternalCache" path="." />
-
+    <root-path  name="pathRoot" path="." />
 </paths>
