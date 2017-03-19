@@ -83,3 +83,7 @@ SAFやらFileProviderやらを使ってみたモックアップです
 ### MediaStoreに登録してからシェア
 + MediaStore.Files ならファイル種別に関わらずシェアできる
 + でもやっぱりDB登録時にMIME type の指定が必須
+
+# MIME type の取得
++ MimeTypeMap を使うと拡張子からMIME type を得られる
++ デジカメのRAW画像など、一覧に情報がないものは得られない
