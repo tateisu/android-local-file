@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Test SAF</string>
+    <string name="folder_up">up</string>
+    <string name="create_sub_folder">create sub folder</string>
+    <string name="folder_name">folder name</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="folder_not_directory">not directory</string>
+    <string name="folder_not_writable">not writable</string>
+    <string name="loading">(loading)</string>
+    <string name="folder_select">select folder %1$s</string>
+    <string name="folder_name_empty">folder name empty</string>
+    <string name="folder_already_exist">folder already exists</string>
+    <string name="folder_creation_failed">folder creation failed</string>
+</resources>
