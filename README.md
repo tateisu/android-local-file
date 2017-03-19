@@ -77,7 +77,7 @@ SAFやらFileProviderやらを使ってみたモックアップです
 ### FileProvider のURLを使ったシェア
 + xmlにシェア可能なpathを列挙しておく必要がある
 + 特殊な拡張子を扱うアプリの場合、FileProvider#getType() は必要に応じてオーバライドするべき
-+ undocumented だが <root-path> を指定するとSDカードのファイルもシェアできる
++ undocumented だが &lt;root-path /&gt; を指定するとSDカードのファイルもシェアできる
 
 ### MediaStoreに登録してからシェア
 + MediaStore.Files ならファイル種別に関わらずシェアできる
