@@ -92,8 +92,6 @@ public class FolderPicker extends AppCompatActivity implements View.OnClickListe
 			File folder = new File( showing_folder, name );
 			if( ! folder.isDirectory() ){
 				Utils.showToast( this, false, R.string.folder_not_directory );
-			}else if( ! folder.canWrite() ){
-				Utils.showToast( this, false, R.string.folder_not_writable );
 			}else{
 				loadFolder( folder );
 			}

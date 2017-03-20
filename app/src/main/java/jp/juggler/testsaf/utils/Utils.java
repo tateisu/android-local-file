@@ -209,7 +209,7 @@ public class Utils{
 	}
 
 
-	public static Uri registMediaURI( Context context,@NonNull File src ,boolean is_external){
+	public static Uri registerMediaURI( Context context, @NonNull File src , boolean is_external){
 		// 既に登録済みかも
 		Uri files_uri = MediaStore.Files.getContentUri( is_external ? "external" : "internal");
 		Cursor cursor = context.getContentResolver().query(

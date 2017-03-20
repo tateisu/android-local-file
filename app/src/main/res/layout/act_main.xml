@@ -3,142 +3,161 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="jp.juggler.testsaf.ActMain"
-    android:fillViewport="true"
-    android:clipToPadding="false"
-    android:padding="12dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbarStyle="outsideOverlay"
+    android:clipToPadding="false"
     android:fadeScrollbars="false"
+    android:fillViewport="true"
+    android:padding="12dp"
+    android:scrollbarStyle="outsideOverlay"
+    tools:context="jp.juggler.testsaf.ActMain"
     >
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    >
 
-    <TextView
-        style="@style/setting_caption"
-        android:text="please select Primary Storage"
-        />
-
-    <LinearLayout style="@style/setting_row">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
 
         <TextView
-            android:id="@+id/tvPrimaryStorage"
-            style="@style/setting_row_stretch"
+            style="@style/setting_caption"
+            android:text="please select Primary Storage"
             />
 
-        <Button
-            android:id="@+id/btnPrimaryStorage"
-            style="@style/setting_picker_button"
-            />
-    </LinearLayout>
+        <LinearLayout
+            style="@style/setting_row"
+            android:baselineAligned="false"
+            android:gravity="center_vertical"
+            >
 
-    <View style="@style/setting_divider"/>
 
-    <TextView
-        style="@style/setting_caption"
-        android:text="please select non-Primary Storage"
-        />
+            <TextView
+                android:id="@+id/tvPrimaryStorage"
+                style="@style/setting_row_stretch"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                />
 
-    <LinearLayout style="@style/setting_row">
+            <Button
+                android:id="@+id/btnPrimaryStorage"
+                style="@style/setting_picker_button"
+                />
+        </LinearLayout>
+
+        <View style="@style/setting_divider"/>
 
         <TextView
-            android:id="@+id/tvSecondaryStorage"
-            style="@style/setting_row_stretch"
+            style="@style/setting_caption"
+            android:text="please select non-Primary Storage"
+
             />
 
-        <Button
-            android:id="@+id/btnSecondaryStorage"
-            style="@style/setting_picker_button"
-            />
-    </LinearLayout>
+        <LinearLayout
+            style="@style/setting_row"
+            android:baselineAligned="false"
+            android:gravity="center_vertical"
+            >
 
-    <View style="@style/setting_divider"/>
+            <TextView
+                android:id="@+id/tvSecondaryStorage"
+                style="@style/setting_row_stretch"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
 
+                />
 
-    <TextView
-        style="@style/setting_caption"
-        android:text="share file from"
-        />
+            <Button
+                android:id="@+id/btnSecondaryStorage"
+                style="@style/setting_picker_button"
+                />
+        </LinearLayout>
 
-    <LinearLayout style="@style/setting_row">
+        <View style="@style/setting_divider"/>
 
-        <Spinner
-            android:id="@+id/spShareFrom"
-            style="@style/setting_row_stretch"
-            />
-    </LinearLayout>
-
-    <View style="@style/setting_divider"/>
-
-
-    <TextView
-        style="@style/setting_caption"
-        android:text="share uri type"
-        />
-
-    <LinearLayout style="@style/setting_row">
-
-        <Spinner
-            android:id="@+id/spShareUriType"
-            style="@style/setting_row_stretch"
-            />
-
-    </LinearLayout>
-
-    <View style="@style/setting_divider"/>
-    <TextView
-        style="@style/setting_caption"
-        android:text="share test"
-        />
-
-    <LinearLayout style="@style/setting_row">
-
-        <Button
-            android:id="@+id/btnShare"
-            style="@style/setting_row_stretch"
-            android:text="share"
-            />
-
-    </LinearLayout>
-
-    <View style="@style/setting_divider"/>
-    <TextView
-        style="@style/setting_caption"
-        android:text="last share uri"
-        />
-
-    <LinearLayout style="@style/setting_row">
 
         <TextView
-            android:id="@+id/tvLastShare"
-            style="@style/setting_row_stretch"
+            style="@style/setting_caption"
+            android:text="share file from"
             />
 
-    </LinearLayout>
-    <View style="@style/setting_divider"/>
-    <!--<TextView-->
+        <LinearLayout style="@style/setting_row">
+
+            <Spinner
+                android:id="@+id/spShareFrom"
+                style="@style/setting_row_stretch"
+                />
+        </LinearLayout>
+
+        <View style="@style/setting_divider"/>
+
+
+        <TextView
+            style="@style/setting_caption"
+            android:text="share uri type"
+            />
+
+        <LinearLayout style="@style/setting_row">
+
+            <Spinner
+                android:id="@+id/spShareUriType"
+                style="@style/setting_row_stretch"
+                />
+
+        </LinearLayout>
+
+        <View style="@style/setting_divider"/>
+
+        <TextView
+            style="@style/setting_caption"
+            android:text="share test"
+            />
+
+        <LinearLayout style="@style/setting_row">
+
+            <Button
+                android:id="@+id/btnShare"
+                style="@style/setting_row_stretch"
+                android:text="share"
+                />
+
+        </LinearLayout>
+
+        <View style="@style/setting_divider"/>
+
+        <TextView
+            style="@style/setting_caption"
+            android:text="last share uri"
+            />
+
+        <LinearLayout style="@style/setting_row">
+
+            <TextView
+                android:id="@+id/tvLastShare"
+                style="@style/setting_row_stretch"
+                />
+
+        </LinearLayout>
+
+        <View style="@style/setting_divider"/>
+        <!--<TextView-->
         <!--android:id="@+id/sample_text"-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="wrap_content"-->
         <!--android:text="Hello World!"-->
         <!--/>-->
 
-    <!--<EditText-->
+        <!--<EditText-->
         <!--android:id="@+id/editTextUserInput"-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="wrap_content"-->
         <!--android:inputType="text"-->
         <!--/>-->
 
-    <!--<Button-->
+        <!--<Button-->
         <!--android:id="@+id/btnTestSample1"-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="wrap_content"-->
         <!--android:text="btnTestSample1"-->
         <!--/>-->
-</LinearLayout>
+    </LinearLayout>
 </ScrollView>

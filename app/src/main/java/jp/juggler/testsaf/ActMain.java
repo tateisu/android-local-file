@@ -95,10 +95,7 @@ public class ActMain extends AppCompatActivity
 
 	@Override public void onRequestPermissionsResult( int requestCode, @NonNull String permissions[], @NonNull int[] grantResults ){
 		if( requestCode == REQUEST_CODE_APP_PERMISSION ){
-			if( permission_checker.permission_request( REQUEST_CODE_APP_PERMISSION ) ){
-				// 権限が取れた。このタイミングで何かする？
-			}
-			return;
+			permission_checker.permission_request( REQUEST_CODE_APP_PERMISSION );
 		}
 	}
 
@@ -477,22 +474,26 @@ public class ActMain extends AppCompatActivity
 		switch( mode ){
 
 		case 0: //File URI
-			if( src.startsWith( "/" ) ) return Uri.fromFile( new File( src ) );
-			uri = Uri.parse( src );
-			if( "file".equals( uri.getScheme() ) ) return uri;
+			if( !is_external){
+				Utils.showToast( this, true, "shall not share the file in internal storage");
+				break;
+			}
+
 			file = Utils.getFile( this, src );
-			if( file != null ) return Uri.fromFile( file );
-			Utils.showToast( this, true, "can not get File URI from %s", src );
-			break;
+			if( file == null ){
+				Utils.showToast( this, true, "can't get file path from %s", src );
+				break;
+			}
+			return Uri.fromFile( file );
 
 		case 1: // SAF content URI
 			if( src.startsWith( "/" ) ){
-				Utils.showToast( this, true, "can not get SAF content URI from %s", src );
+				Utils.showToast( this, true, "can't get SAF content URI from %s", src );
 				break;
 			}
 			uri = Uri.parse( src );
 			if( "file".equals( uri.getScheme() ) ){
-				Utils.showToast( this, true, "can not get SAF content URI from %s", src );
+				Utils.showToast( this, true, "can't get SAF content URI from %s", src );
 				break;
 			}
 			return uri;
@@ -500,7 +501,7 @@ public class ActMain extends AppCompatActivity
 		case 2: // FileProvider URI
 			file = Utils.getFile( this, src );
 			if( file == null ){
-				Utils.showToast( this, true, "can not File path from %s", src );
+				Utils.showToast( this, true, "can't get file path from %s", src );
 				break;
 			}
 			uri = FileProvider.getUriForFile(this, "jp.juggler.testsaf.fileprovider", file);
@@ -508,10 +509,9 @@ public class ActMain extends AppCompatActivity
 			// IllegalArgumentException: Failed to find configured root that contains /storage/3136-6334/image1.jpg
 			// ワークアラウンド： FileProviderに指定するpath xml に <root-path  name="pathRoot" path="." /> を追加
 			if( uri == null ){
-				Utils.showToast( this, true, "can not get FileProvider URI from %s", file.getAbsolutePath() );
+				Utils.showToast( this, true, "can't get FileProvider URI from %s", file.getAbsolutePath() );
 				break;
 			}else{
-
 				Cursor cursor = getContentResolver().query(
 					uri
 					, null
@@ -542,14 +542,21 @@ public class ActMain extends AppCompatActivity
 			return uri;
 
 		case 3: // MediaStore URI
-			file = Utils.getFile( this, src );
-			if( file == null ){
-				Utils.showToast( this, true, "can not File path from %s", src );
+
+			if( !is_external){
+				Utils.showToast( this, true, "shall not share the file in internal storage");
 				break;
 			}
-			uri = Utils.registMediaURI( this,file,is_external);
+
+			file = Utils.getFile( this, src );
+			if( file == null ){
+				Utils.showToast( this, true, "can't get file path from %s", src );
+				break;
+			}
+
+			uri = Utils.registerMediaURI( this,file,true);
 			if( uri == null ){
-				Utils.showToast( this, true, "can not get media URI from %s", file.getAbsolutePath() );
+				Utils.showToast( this, true, "can't register media URI for %s", file.getAbsolutePath() );
 				break;
 			}
 			return uri;
