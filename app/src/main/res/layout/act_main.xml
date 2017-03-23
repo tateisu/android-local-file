@@ -77,7 +77,7 @@
 
         <TextView
             style="@style/setting_caption"
-            android:text="share file from"
+            android:text="file from"
             />
 
         <LinearLayout style="@style/setting_row">
@@ -93,7 +93,7 @@
 
         <TextView
             style="@style/setting_caption"
-            android:text="share uri type"
+            android:text="uri type"
             />
 
         <LinearLayout style="@style/setting_row">
@@ -109,7 +109,7 @@
 
         <TextView
             style="@style/setting_caption"
-            android:text="share test"
+            android:text="tests with file and uri"
             />
 
         <LinearLayout style="@style/setting_row">
@@ -134,6 +134,22 @@
             <TextView
                 android:id="@+id/tvLastShare"
                 style="@style/setting_row_stretch"
+                />
+
+        </LinearLayout>
+
+        <View style="@style/setting_divider"/>
+        <TextView
+            style="@style/setting_caption"
+            android:text="update widget image"
+            />
+
+        <LinearLayout style="@style/setting_row">
+
+            <Button
+                android:id="@+id/btnWidget"
+                style="@style/setting_row_stretch"
+                android:text="update widget image"
                 />
 
         </LinearLayout>

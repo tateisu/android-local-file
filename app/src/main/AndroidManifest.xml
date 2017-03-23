@@ -20,17 +20,31 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".FolderPicker" />
+
+        <activity android:name=".FolderPicker"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="jp.juggler.testsaf.fileprovider"
+            android:exported="false"
             android:grantUriPermissions="true"
-            android:exported="false">
+            >
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_provider_path" />
+                android:resource="@xml/file_provider_path"
+                />
         </provider>
+
+        <receiver android:name=".WidgetHasImage">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_has_image"
+                />
+        </receiver>
+
     </application>
 
 </manifest>

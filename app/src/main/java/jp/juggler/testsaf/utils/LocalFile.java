@@ -269,13 +269,13 @@ public class LocalFile{
 	}
 
 	@SuppressLint( "NewApi" )
-	public static String handleFolderPickerResult( Context context, int resultCode, Intent resultData ){
+	public static String handleFolderPickerResult( Activity activity, int resultCode, Intent resultData ){
 		try{
 			if( resultCode == Activity.RESULT_OK ){
 				if( Build.VERSION.SDK_INT >= LocalFile.DOCUMENT_FILE_VERSION ){
 					Uri treeUri = resultData.getData();
 					// 永続的な許可を取得
-					context.getContentResolver().takePersistableUriPermission(
+					activity.getContentResolver().takePersistableUriPermission(
 						treeUri
 						, Intent.FLAG_GRANT_READ_URI_PERMISSION
 							| Intent.FLAG_GRANT_WRITE_URI_PERMISSION
@@ -285,12 +285,12 @@ public class LocalFile{
 					String path = resultData.getStringExtra( FolderPicker.EXTRA_FOLDER );
 					String error = checkFolderWritable( path );
 					if( TextUtils.isEmpty( error ) ) return path;
-					Utils.showToast( context, true, "folder access failed. %s", error );
+					Utils.showToast( activity, true, "folder access failed. %s", error );
 				}
 			}
 		}catch( Throwable ex ){
 			ex.printStackTrace();
-			Utils.showToast( context, ex, "folder access failed." );
+			Utils.showToast( activity, ex, "folder access failed." );
 		}
 		return null;
 	}

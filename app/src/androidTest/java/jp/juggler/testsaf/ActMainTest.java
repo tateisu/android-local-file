@@ -22,12 +22,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 
-import jp.juggler.testsaf.utils.LocalFile;
+import jp.juggler.testsaf.utils.FileCreator;
 import jp.juggler.testsaf.utils.LogWriter;
 import jp.juggler.testsaf.utils.Utils;
 
@@ -299,7 +295,6 @@ public class ActMainTest{
 			return readTest( new File( uri.getPath() ) );
 		}
 
-		DocumentFile df = DocumentFile.fromSingleUri( mActMain, uri );
 		boolean rv = readTest( mActMain.getContentResolver().openInputStream( uri ) );
 
 		File path = Utils.getFile( mActMain, uri.toString() );
@@ -339,7 +334,7 @@ public class ActMainTest{
 	@Test
 	public void createFileToSomeLocations() throws Exception{
 		int error_count = 0;
-		for( ActMain.FileCreator creator : mActMain.getFileCreatorList() ){
+		for( FileCreator creator : FileCreator.getFileCreatorList(mActMain) ){
 
 			// ファイルを作成する
 			String file;
@@ -375,16 +370,15 @@ public class ActMainTest{
 				ex.printStackTrace();
 				log.e( ex, "file read failed" );
 				++ error_count;
-				continue;
 			}
 		}
-		for( ActMain.FileCreator creator : mActMain.getFileCreatorList() ){
+		for( FileCreator creator : FileCreator.getFileCreatorList(mActMain) ){
 			try{
 				String sub_dir = creator.createDirectory();
 				if( sub_dir == null ){
 					++ error_count;
 				}
-				String sub_file = mActMain.saveImage( sub_dir );
+				String sub_file = FileCreator.saveImage( mActMain,sub_dir );
 				if( sub_file == null ){
 					++ error_count;
 				}
@@ -392,7 +386,6 @@ public class ActMainTest{
 				ex.printStackTrace();
 				log.e( ex, "sub dir & file creation failed." );
 				++ error_count;
-				continue;
 			}
 		}
 		assertEquals( 0, error_count );

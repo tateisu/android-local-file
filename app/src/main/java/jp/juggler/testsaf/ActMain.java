@@ -5,10 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
-import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -17,15 +15,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 import jp.juggler.testsaf.permission.PermissionChecker;
+import jp.juggler.testsaf.utils.FileCreator;
 import jp.juggler.testsaf.utils.LocalFile;
 import jp.juggler.testsaf.utils.LogWriter;
 import jp.juggler.testsaf.utils.Utils;
@@ -64,22 +58,42 @@ public class ActMain extends AppCompatActivity
 			try{
 				FileCreator fc = creator_list.get( spShareFrom.getSelectedItemPosition() );
 				String file = fc.createFile();
-				Uri uri = changeUri( file, spShareUriType.getSelectedItemPosition() ,fc.is_external );
+				Uri uri = changeUri( file, spShareUriType.getSelectedItemPosition()
+					, fc.is_external
+				);
 				if( uri != null ){
-					tvLastShare.setText(uri.toString());
-					Intent intent = new Intent( Intent.ACTION_VIEW );
-					intent.setDataAndType( uri, Utils.getMimeType( file ) );
+					Pref.pref( this ).edit().putString( Pref.WIDGET_IMAGE_URI, uri.toString() ).apply();
+					WidgetHasImage.updateWidget( this );
 
-					intent.setDataAndType(uri, Utils.getMimeType( file )); // MimeTypeMapが使われる…
+					tvLastShare.setText( uri.toString() );
+					Intent intent = new Intent( Intent.ACTION_VIEW );
+					intent.setDataAndType( uri, Utils.getMimeType( file ) ); // MimeTypeMapが使われる…
 					intent.addFlags(
 						Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 							| Intent.FLAG_GRANT_READ_URI_PERMISSION
 					);
-					startActivityForResult(intent,REQUEST_CODE_SHARE);
+					startActivityForResult( intent, REQUEST_CODE_SHARE );
 				}
 			}catch( Throwable ex ){
 				ex.printStackTrace();
 				Utils.showToast( this, ex, "share failed" );
+			}
+			break;
+		case R.id.btnWidget:
+			try{
+				FileCreator fc = creator_list.get( spShareFrom.getSelectedItemPosition() );
+				String str_file = fc.createFile();
+				File file = Utils.getFile( this, str_file );
+				if( file == null ){
+					Utils.showToast( this, true, "can't get file path from %s", str_file );
+				}else{
+					if( ! WidgetHasImage.updateImage( this, file ) ){
+						WidgetHasImage.deleteImage( this );
+					}
+				}
+			}catch( Throwable ex ){
+				ex.printStackTrace();
+				Utils.showToast( this, ex, "widget updateWidget failed." );
 			}
 			break;
 		}
@@ -144,7 +158,7 @@ public class ActMain extends AppCompatActivity
 	protected void onCreate( Bundle savedInstanceState ){
 		super.onCreate( savedInstanceState );
 
-		creator_list = getFileCreatorList();
+		creator_list = FileCreator.getFileCreatorList( getApplicationContext() );
 
 		permission_checker = new PermissionChecker( this );
 
@@ -159,7 +173,8 @@ public class ActMain extends AppCompatActivity
 		spShareFrom = (Spinner) findViewById( R.id.spShareFrom );
 		spShareUriType = (Spinner) findViewById( R.id.spShareUriType );
 		findViewById( R.id.btnShare ).setOnClickListener( this );
-		tvLastShare= (TextView) findViewById( R.id.tvLastShare );
+		tvLastShare = (TextView) findViewById( R.id.tvLastShare );
+		findViewById( R.id.btnWidget ).setOnClickListener( this );
 
 		{
 			ArrayAdapter<String> share_from_adapter = new ArrayAdapter<>(
@@ -223,259 +238,14 @@ public class ActMain extends AppCompatActivity
 		tvSecondaryStorage.setText( sv );
 	}
 
-	public String getPrimaryStorage(){
-		SharedPreferences pref = Pref.pref( this );
-		return pref.getString( Pref.UI_PRIMARY_STORAGE, "" );
-	}
-
-	public String getSecondaryStorage(){
-		SharedPreferences pref = Pref.pref( this );
-		return pref.getString( Pref.UI_SECONDARY_STORAGE, "" );
-	}
-
-	String saveImage( File dir ) throws Exception{
-		File file = new File( dir, "image1.jpg" );
-
-		InputStream is = this.getAssets().open( "image1.jpg" );
-		try{
-			FileOutputStream os = new FileOutputStream( file );
-			try{
-				IOUtils.copy( is, os );
-			}finally{
-				try{
-					os.close();
-				}catch( Throwable ignored ){
-
-				}
-			}
-		}finally{
-			try{
-				is.close();
-			}catch( Throwable ignored ){
-
-			}
-		}
-
-		return file.getAbsolutePath();
-	}
-
-	String saveImage( DocumentFile dir ) throws Exception{
-		String file_name = "image1.jpg";
-		DocumentFile file = null;
-		for( DocumentFile df : dir.listFiles() ){
-			if( file_name.equals( df.getName() ) ){
-				file = df;
-				break;
-			}
-		}
-		if( file == null ){
-			file = dir.createFile( "image/jpeg", file_name );
-		}
-		Uri file_uri = file.getUri();
-
-		InputStream is = this.getAssets().open( "image1.jpg" );
-		try{
-			OutputStream os = this.getContentResolver().openOutputStream( file_uri );
-			if( os == null ) return null;
-			try{
-				IOUtils.copy( is, os );
-			}finally{
-				try{
-					os.close();
-				}catch( Throwable ignored ){
-				}
-			}
-		}finally{
-			try{
-				is.close();
-			}catch( Throwable ignored ){
-			}
-		}
-		return file_uri.toString();
-	}
-
-	String saveImage( String dir ) throws Exception{
-
-		if( dir.startsWith( "/" ) ) return saveImage( new File( dir ) );
-
-		Uri uri = Uri.parse( dir );
-
-		if( uri.getScheme().equals( "file" ) ) return saveImage( new File( uri.getPath() ) );
-
-		DocumentFile df = DocumentFile.fromTreeUri( this, uri );
-		return saveImage( df );
-	}
-
-	String createSubDirectory( File parent, String name ) throws Exception{
-		File dir = new File( parent, name );
-		if( ! dir.mkdir() && ! dir.isDirectory() ){
-			throw new RuntimeException( String.format( "directory creation failed. %s", dir.getAbsolutePath() ) );
-		}
-		return dir.getAbsolutePath();
-	}
-
-	String createSubDirectory( String parent, String name ) throws Exception{
-
-		if( parent.startsWith( "/" ) ) return createSubDirectory( new File( parent ), name );
-
-		Uri uri = Uri.parse( parent );
-		if( uri.getScheme().equals( "file" ) ) return createSubDirectory( new File( uri.getPath() ), name );
-
-		File path = Utils.getFile( this, parent );
-		if( path == null ){
-			throw new RuntimeException( String.format( "can not get path from uri. %s", parent ) );
-		}
-		return createSubDirectory( path, name );
-	}
-
-	abstract class FileCreator{
-
-		boolean is_external;
-		final String name;
-
-		FileCreator( boolean is_external,String name ){
-			this.is_external = is_external;
-			this.name = name;
-		}
-
-		abstract String createFile() throws Exception;
-
-		abstract String createDirectory() throws Exception;
-
-	}
-
-	ArrayList<FileCreator> getFileCreatorList(){
-		ArrayList<FileCreator> result = new ArrayList<>();
-		result.add(
-			new FileCreator( false,"Context#getFilesDir" ){
-				File getDir(){
-					File dir = ActMain.this.getFilesDir();
-					if(dir!=null){
-						//noinspection ResultOfMethodCallIgnored
-						dir.mkdir();
-					}
-					return dir;
-				}
-
-				@Override String createFile() throws Exception{
-					return saveImage( getDir() );
-				}
-
-				@Override String createDirectory() throws Exception{
-					return createSubDirectory( getDir(), "test_dir" );
-				}
-			} );
-
-		result.add( new FileCreator(  false,"Context#getCacheDir" ){
-			File getDir(){
-				File dir = ActMain.this.getCacheDir();
-				if(dir!=null){
-					//noinspection ResultOfMethodCallIgnored
-					dir.mkdir();
-				}
-				return dir;
-			}
-
-			@Override String createFile() throws Exception{
-				return saveImage( getDir() );
-			}
-
-			@Override String createDirectory() throws Exception{
-				return createSubDirectory( getDir(), "test_dir" );
-			}
-		} );
-		result.add( new FileCreator( true, "Context#getExternalFilesDir" ){
-			File getDir(){
-				File dir = ActMain.this.getExternalFilesDir( Environment.DIRECTORY_DOWNLOADS );
-				if(dir!=null){
-					//noinspection ResultOfMethodCallIgnored
-					dir.mkdir();
-				}
-				return dir;
-			}
-
-			@Override String createFile() throws Exception{
-				return saveImage( getDir() );
-			}
-
-			@Override String createDirectory() throws Exception{
-				return createSubDirectory( getDir(), "test_dir" );
-			}
-		} );
-		result.add( new FileCreator(  true,"Context#getExternalCacheDir" ){
-			File getDir(){
-				File dir = ActMain.this.getExternalCacheDir();
-				if(dir!=null){
-					//noinspection ResultOfMethodCallIgnored
-					dir.mkdir();
-				}
-				return dir;
-			}
-
-			@Override String createFile() throws Exception{
-				return saveImage( getDir() );
-			}
-
-			@Override String createDirectory() throws Exception{
-				return createSubDirectory( getDir(), "test_dir" );
-			}
-
-		} );
-		result.add( new FileCreator(  true,"Environment#getExternalStorageDirectory" ){
-			File getDir(){
-				File dir =  Environment.getExternalStorageDirectory();
-				if(dir!=null){
-					//noinspection ResultOfMethodCallIgnored
-					dir.mkdir();
-				}
-				return dir;
-			}
-
-			@Override String createFile() throws Exception{
-				return saveImage( getDir() );
-			}
-
-			@Override String createDirectory() throws Exception{
-				return createSubDirectory( getDir(), "test_dir" );
-			}
-		} );
-		result.add( new FileCreator(  true,"getPrimaryStorage" ){
-			String getDir(){
-				return ActMain.this.getPrimaryStorage();
-			}
-
-			@Override String createFile() throws Exception{
-				return saveImage( getDir() );
-			}
-
-			@Override String createDirectory() throws Exception{
-				return createSubDirectory( getDir(), "test_dir" );
-			}
-		} );
-		result.add( new FileCreator(  true,"getSecondaryStorage" ){
-			String getDir(){
-				return ActMain.this.getSecondaryStorage();
-			}
-
-			@Override String createFile() throws Exception{
-				return saveImage( getDir() );
-			}
-
-			@Override String createDirectory() throws Exception{
-				return createSubDirectory( getDir(), "test_dir" );
-			}
-		} );
-		return result;
-	}
-
-	private Uri changeUri( String src, int mode ,boolean is_external){
+	private Uri changeUri( String src, int mode, boolean is_external ){
 		Uri uri;
 		File file;
 		switch( mode ){
 
 		case 0: //File URI
-			if( !is_external){
-				Utils.showToast( this, true, "shall not share the file in internal storage");
+			if( ! is_external ){
+				Utils.showToast( this, true, "shall not share the file in internal storage" );
 				break;
 			}
 
@@ -504,7 +274,7 @@ public class ActMain extends AppCompatActivity
 				Utils.showToast( this, true, "can't get file path from %s", src );
 				break;
 			}
-			uri = FileProvider.getUriForFile(this, "jp.juggler.testsaf.fileprovider", file);
+			uri = FileProvider.getUriForFile( this, "jp.juggler.testsaf.fileprovider", file );
 			// LGV32(Android 6.0)でSDカードを使うと例外発生
 			// IllegalArgumentException: Failed to find configured root that contains /storage/3136-6334/image1.jpg
 			// ワークアラウンド： FileProviderに指定するpath xml に <root-path  name="pathRoot" path="." /> を追加
@@ -528,7 +298,7 @@ public class ActMain extends AppCompatActivity
 								if( type != Cursor.FIELD_TYPE_STRING ) continue;
 								String name = cursor.getColumnName( i );
 								String value = cursor.isNull( i ) ? null : cursor.getString( i );
-								log.d("FileProvider data: %s %s",name,value);
+								log.d( "FileProvider data: %s %s", name, value );
 							}
 						}else{
 							Utils.showToast( this, true, "invalid FileProvider URI. %s", file.getAbsolutePath() );
@@ -543,8 +313,8 @@ public class ActMain extends AppCompatActivity
 
 		case 3: // MediaStore URI
 
-			if( !is_external){
-				Utils.showToast( this, true, "shall not share the file in internal storage");
+			if( ! is_external ){
+				Utils.showToast( this, true, "shall not share the file in internal storage" );
 				break;
 			}
 
@@ -554,7 +324,7 @@ public class ActMain extends AppCompatActivity
 				break;
 			}
 
-			uri = Utils.registerMediaURI( this,file,true);
+			uri = Utils.registerMediaURI( this, file, true );
 			if( uri == null ){
 				Utils.showToast( this, true, "can't register media URI for %s", file.getAbsolutePath() );
 				break;
